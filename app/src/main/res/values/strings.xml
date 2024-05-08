@@ -1,3 +1,214 @@
 <resources>
-    <string name="app_name">Daodian</string>
+    <string name="app_name">沛谊订单提醒</string>
+    <string name="choose_business_category">选择经营类别</string>
+
+
+    <!--<string name="app_name">PrinterSdk</string>-->
+    <string name="title_paired_devices">已配对</string>
+    <string name="title_other_devices">New</string>
+    <string name="scan">扫描</string>
+    <string name="bluetooth_device_list">蓝牙设备列表</string>
+    <string name="select_bluetooth_device">选择蓝牙设备</string>
+    <string name="none_bluetooth_device_found">没有找到蓝牙设备</string>
+    <string name="none_paired">没有已配对设备</string>
+    <string name="scaning">扫描</string>
+    <string name="usb_devices_list">USB设备列表</string>
+    <string name="none_usb_device">没有USB设备</string>
+
+    <string-array name="baudrate">
+        <item>4800</item>
+        <item>9600</item>
+        <item>19200</item>
+        <item>38400</item>
+        <item>115200</item>
+    </string-array>
+    <string name="str_no_serialport">该设备不支持串口</string>
+    <string name="str_conn_state_disconnect">连接状态：未连接</string>
+    <string name="str_conn_state_connecting">连接状态：连接中</string>
+    <string name="str_connecting">连接中</string>
+    <string name="str_conn_state_connected">连接状态：已连接</string>
+    <string name="str_wifi_ip">请输入IP：</string>
+    <string name="str_ip">IP: </string>
+    <string name="str_port">Port: </string>
+    <string name="str_wifi_port">请输入端口号：</string>
+    <string name="str_state_query">状态查询</string>
+    <string name="str_power_query">电量查询</string>
+    <string name="str_mode_change">更换打印模式</string>
+    <string name="str_update_bluetooth_name">设置蓝牙名称前缀</string>
+    <string name="str_disconnect">断开连接</string>
+    <string name="str_label_print">标签打印</string>
+    <string name="str_receipt_print">票据打印</string>
+    <string name="str_cpcl_print">面单打印</string>
+    <string name="str_bluetooth_connect">蓝牙连接</string>
+    <string name="str_usb_connect">USB连接</string>
+    <string name="str_wifi_connect">wifi连接</string>
+    <string name="str_serialport_connect">串口连接</string>
+    <string name="str_confirm">确定</string>
+    <string name="str_cancel">取消</string>
+    <string name="str_cann_printer">请先连接打印机</string>
+    <string name="str_bluetooth">蓝牙</string>
+    <string name="str_serialport">串口</string>
+    <string name="str_usb">USB</string>
+    <string name="str_wifi">WIFI</string>
+    <string name="str_conn_successful">连接成功！</string>
+    <string name="str_conn_fail">连接失败！</string>
+    <string name="str_baudrate">波特率：</string>
+    <string name="str_serialport_path">串口路径：</string>
+    <string name="str_conn_devices">多设备</string>
+    <string name="str_conn_receipt_and_label_continuity_print">连续打印</string>
+    <string name="str_address">地址：</string>
+    <string name="printer001">Printer 001</string>
+    <string name="printer002">Printer 002</string>
+    <string name="printer003">Printer 003</string>
+    <string name="printer004">Printer 004</string>
+    <string name="disconnect">断开连接</string>
+    <string name="cut">未连接</string>
+    <string name="cutting">断开连接中...</string>
+    <string name="str_disconn">断开</string>
+    <string name="connect">连接</string>
+    <string name="connected">已连接</string>
+    <string name="connecting">连接中...</string>
+    <string name="port">接口:未设定 </string>
+    <string name="init_port_info">地址:不详</string>
+    <string name="str_enter_print_counts">请输入打印次数：</string>
+    <string name="str_choice_printer_command">请选择正确的打印机指令</string>
+    <string name="str_printer_conn_normal">打印机连接正常</string>
+    <string name="str_printer_out_of_paper">打印机缺纸</string>
+    <string name="str_printer_open_cover">打印机开盖</string>
+    <string name="str_printer_error">打印机出错</string>
+    <string name="str_state">状态：</string>
+    <string name="str_interface_undefine">接口：未设定</string>
+    <string name="str_select_printer_id">选中id为{0}的打印机</string>
+    <string name="bluetooth_is_not_enabled">蓝牙没有开启</string>
+    <string-array name="str_interf_type">
+        <item>蓝牙</item>
+        <item>网口</item>
+        <item>USB</item>
+    </string-array>
+    <string name="str_cpclmode">面单模式</string>
+    <string name="str_escmode">票据模式</string>
+    <string name="str_tscmode">标签模式</string>
+    <string name="str_synchronous_print">多设备同步打印</string>
+    <string name="str_printer_printmode_esc">打印模式:ESC</string>
+    <string name="str_printer_printmode_tsc">打印模式:TSC</string>
+    <string name="str_printer_printmode_cpcl">打印模式:CPCL</string>
+    <string name="str_continuityprinter">连续打印:</string>
+    <string name="str_continuity_count">连续打印的数目为空</string>
+    <string name="str_stop_continuityprint">停止连续打印</string>
+    <string name="str_stop_continuityprint_success">成功停止打印</string>
+    <string name="str_disconnect_success">成功断开连接</string>
+    <string name="str_title_newdev">未配对</string>
+    <string name="str_title_pairedev">已配对</string>
+    <string name="str_tv_printcount">打印次数:</string>
+    <string name="str_print_selftest">打印自检页</string>
+    <string name="str_print_xml">打印XML</string>
+    <string name="str_please_enter_name">请输入蓝牙名称</string>
+    <string name="str_please_less_9">请输入低于9个字的前缀</string>
+    <string name="str_low_power">电量：低电量</string>
+    <string name="str_amid_power">电量：中电量</string>
+    <string name="str_high_power">电量：高电量</string>
+    <string name="str_charging">正在充电</string>
+
+
+    <!-- login -->
+    <string name="username_only_can_input">qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM1234567890</string>
+    <string name="login_welcome">欢迎使用\n采购员</string>
+    <string name="hint_user_name">用户名1</string>
+    <string name="hint_password">密码</string>
+    <string name="hint_again_password">确认密码</string>
+    <string name="hint_shop_name">店铺名称</string>
+    <string name="login">登录</string>
+    <string name="no_restraunt">没有要回复的客户</string>
+    <string name="title_activity_customer_orders_acitivity">CustomerOrdersAcitivity</string>
+    <string name="large_text">
+        "Material is the metaphor.\n\n"
+
+        "A material metaphor is the unifying theory of a rationalized space and a system of motion."
+        "The material is grounded in tactile reality, inspired by the study of paper and ink, yet "
+        "technologically advanced and open to imagination and magic.\n"
+        "Surfaces and edges of the material provide visual cues that are grounded in reality. The "
+        "use of familiar tactile attributes helps users quickly understand affordances. Yet the "
+        "flexibility of the material creates new affordances that supercede those in the physical "
+        "world, without breaking the rules of physics.\n"
+        "The fundamentals of light, surface, and movement are key to conveying how objects move, "
+        "interact, and exist in space and in relation to each other. Realistic lighting shows "
+        "seams, divides space, and indicates moving parts.\n\n"
+
+        "Bold, graphic, intentional.\n\n"
+
+        "The foundational elements of print based design typography, grids, space, scale, color, "
+        "and use of imagery guide visual treatments. These elements do far more than please the "
+        "eye. They create hierarchy, meaning, and focus. Deliberate color choices, edge to edge "
+        "imagery, large scale typography, and intentional white space create a bold and graphic "
+        "interface that immerse the user in the experience.\n"
+        "An emphasis on user actions makes core functionality immediately apparent and provides "
+        "waypoints for the user.\n\n"
+
+        "Motion provides meaning.\n\n"
+
+        "Motion respects and reinforces the user as the prime mover. Primary user actions are "
+        "inflection points that initiate motion, transforming the whole design.\n"
+        "All action takes place in a single environment. Objects are presented to the user without "
+        "breaking the continuity of experience even as they transform and reorganize.\n"
+        "Motion is meaningful and appropriate, serving to focus attention and maintain continuity. "
+        "Feedback is subtle yet clear. Transitions are efﬁcient yet coherent.\n\n"
+
+        "3D world.\n\n"
+
+        "The material environment is a 3D space, which means all objects have x, y, and z "
+        "dimensions. The z-axis is perpendicularly aligned to the plane of the display, with the "
+        "positive z-axis extending towards the viewer. Every sheet of material occupies a single "
+        "position along the z-axis and has a standard 1dp thickness.\n"
+        "On the web, the z-axis is used for layering and not for perspective. The 3D world is "
+        "emulated by manipulating the y-axis.\n\n"
+
+        "Light and shadow.\n\n"
+
+        "Within the material environment, virtual lights illuminate the scene. Key lights create "
+        "directional shadows, while ambient light creates soft shadows from all angles.\n"
+        "Shadows in the material environment are cast by these two light sources. In Android "
+        "development, shadows occur when light sources are blocked by sheets of material at "
+        "various positions along the z-axis. On the web, shadows are depicted by manipulating the "
+        "y-axis only. The following example shows the card with a height of 6dp.\n\n"
+
+        "Resting elevation.\n\n"
+
+        "All material objects, regardless of size, have a resting elevation, or default elevation "
+        "that does not change. If an object changes elevation, it should return to its resting "
+        "elevation as soon as possible.\n\n"
+
+        "Component elevations.\n\n"
+
+        "The resting elevation for a component type is consistent across apps (e.g., FAB elevation "
+        "does not vary from 6dp in one app to 16dp in another app).\n"
+        "Components may have different resting elevations across platforms, depending on the depth "
+        "of the environment (e.g., TV has a greater depth than mobile or desktop).\n\n"
+
+        "Responsive elevation and dynamic elevation offsets.\n\n"
+
+        "Some component types have responsive elevation, meaning they change elevation in response "
+        "to user input (e.g., normal, focused, and pressed) or system events. These elevation "
+        "changes are consistently implemented using dynamic elevation offsets.\n"
+        "Dynamic elevation offsets are the goal elevation that a component moves towards, relative "
+        "to the component’s resting state. They ensure that elevation changes are consistent "
+        "across actions and component types. For example, all components that lift on press have "
+        "the same elevation change relative to their resting elevation.\n"
+        "Once the input event is completed or cancelled, the component will return to its resting "
+        "elevation.\n\n"
+
+        "Avoiding elevation interference.\n\n"
+
+        "Components with responsive elevations may encounter other components as they move between "
+        "their resting elevations and dynamic elevation offsets. Because material cannot pass "
+        "through other material, components avoid interfering with one another any number of ways, "
+        "whether on a per component basis or using the entire app layout.\n"
+        "On a component level, components can move or be removed before they cause interference. "
+        "For example, a floating action button (FAB) can disappear or move off screen before a "
+        "user picks up a card, or it can move if a snackbar appears.\n"
+        "On the layout level, design your app layout to minimize opportunities for interference. "
+        "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
+        "when a user tries to pick up one of cards.\n\n"
+    </string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_customer_orders">CustomerOrdersActivity</string>
 </resources>
