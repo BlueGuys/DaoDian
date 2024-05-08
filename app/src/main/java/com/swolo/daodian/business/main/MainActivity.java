@@ -129,7 +129,6 @@ public class MainActivity extends BaseActivity {
         mStateStringBuilder.delete(0, mStateStringBuilder.length());
         checkPermission();
         connectUSB();
-        checkPrinter();
     }
 
     private void notifyState(String str) {
@@ -175,37 +174,38 @@ public class MainActivity extends BaseActivity {
                         .setCallbackListener(new CallbackListener() {
                             @Override
                             public void onConnecting() {
-                                notifyState("连接中...");
+                                notifyState("连接中...\n");
                             }
 
                             @Override
                             public void onCheckCommand() {
-                                notifyState("查询中...");
+                                notifyState("查询中...\n");
                             }
 
                             @Override
                             public void onSuccess(PrinterDevices printerDevices) {
-                                notifyState("已连接");
+                                notifyState("已连接\n");
                             }
 
                             @Override
                             public void onReceive(byte[] data) {
-                                notifyState("连接中...");
+                                notifyState("连接中...\n");
                             }
 
                             @Override
                             public void onFailure() {
-                                notifyState("连接失败...");
+                                notifyState("连接失败...\n");
                             }
 
                             @Override
                             public void onDisconnect() {
-                                notifyState("断开连接...");
+                                notifyState("断开连接...\n");
                             }
                         })
                         .build();
                 printer = Printer.getInstance();
                 printer.connect(usb);
+                checkPrinter();
                 return true;
             }
         } else {
@@ -219,7 +219,7 @@ public class MainActivity extends BaseActivity {
      */
     public void checkPrinter() {
         notifyState("-------------------------------------------------\n");
-        notifyState("打印机检测:\n");
+        notifyState("3.打印机检测:\n");
         ThreadPoolManager.getInstance().addTask(new Runnable() {
             @Override
             public void run() {
@@ -234,10 +234,8 @@ public class MainActivity extends BaseActivity {
                     msg.what = 0x01;
                     msg.arg1 = status;
                     handler.sendMessage(msg);
-                } catch (IOException e) {
-                    notifyState("状态获取异常\n");
-                } catch (Exception e) {
-                    notifyState("状态获取异常\n");
+                }  catch (Exception e) {
+                    notifyState("状态获取异常\n" + e.getMessage());
                 }
             }
         });
