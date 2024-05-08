@@ -211,4 +211,11 @@
     </string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_customer_orders">CustomerOrdersActivity</string>
+    <string name="Order">订单</string>
+    <string name="name">名称</string>
+    <string name="Quantity">数量</string>
+    <string name="price">价格</string>
+    <string name="total_amount">总金额:</string>
+    <string name="cashier">收银员:</string>
+    <string name="gap">标签间隙：</string>
 </resources>

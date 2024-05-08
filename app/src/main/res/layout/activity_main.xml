@@ -2,50 +2,34 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal">
 
     <TextView
         android:id="@+id/tv_usb"
         android:layout_width="match_parent"
-        android:layout_height="100dp" />
+        android:layout_height="100dp"
+        android:textColor="@color/black"
+        android:layout_margin="15dp"/>
 
     <Button
-        android:id="@+id/btn_usb"
+        android:onClick="print"
         android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:layout_margin="24dp"
-        android:background="@drawable/common_btn_selector"
-        android:text="连接USB"
-        android:textColor="@color/white"
-        android:textSize="@dimen/text_size_16" />
-
-    <Button
-        android:id="@+id/btn_connect_printer"
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:layout_margin="24dp"
-        android:background="@drawable/common_btn_selector"
-        android:text="连接打印机"
-        android:textColor="@color/white"
-        android:textSize="@dimen/text_size_16" />
-
-    <Button
-        android:id="@+id/btn_disconnect_printer"
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:layout_margin="24dp"
-        android:background="@drawable/common_btn_selector"
-        android:text="断开打印机"
-        android:textColor="@color/white"
-        android:textSize="@dimen/text_size_16" />
-
-    <Button
-        android:id="@+id/btn_test_printer"
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
+        android:layout_height="64dp"
         android:layout_margin="24dp"
         android:background="@drawable/common_btn_selector"
         android:text="测试打印机"
         android:textColor="@color/white"
         android:textSize="@dimen/text_size_16" />
+
+    <Button
+        android:onClick="init"
+        android:layout_width="100dp"
+        android:layout_height="44dp"
+        android:layout_margin="24dp"
+        android:background="@drawable/common_btn_selector"
+        android:text="重置状态"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_16" />
+
 </LinearLayout>
