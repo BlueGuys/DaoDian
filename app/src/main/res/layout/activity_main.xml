@@ -1,36 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_horizontal">
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tv_usb"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@color/green">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="实时订单"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_18"
+            android:textStyle="bold"
+            android:layout_centerInParent="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="15dp"
+            android:gravity="center"
+            android:text="已打印"
+            android:onClick="jumpOrderList"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_18"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:textColor="@color/black"
-        android:layout_margin="15dp"/>
+        android:padding="15dp">
 
-    <Button
-        android:onClick="print"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="新订单产生，这里展示打印进度，打印动画："/>
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:layout_margin="24dp"
-        android:background="@drawable/common_btn_selector"
-        android:text="测试打印机"
-        android:textColor="@color/white"
-        android:textSize="@dimen/text_size_16" />
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@drawable/common_linear"
+        android:orientation="vertical">
 
-    <Button
-        android:onClick="init"
-        android:layout_width="100dp"
-        android:layout_height="44dp"
-        android:layout_margin="24dp"
-        android:background="@drawable/common_btn_selector"
-        android:text="重置状态"
-        android:textColor="@color/white"
-        android:textSize="@dimen/text_size_16" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="打印机状态:"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="15dp"/>
+
+        <TextView
+            android:id="@+id/tv_usb"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginLeft="15dp"
+            android:textColor="@color/black" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="15dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="44dp"
+                android:background="@drawable/common_btn_selector"
+                android:onClick="init"
+                android:text="重连打印机"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_16" />
+
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="44dp"
+                android:layout_marginLeft="30dp"
+                android:background="@drawable/common_btn_selector"
+                android:onClick="print"
+                android:text="测试打印机"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_16" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
 
 </LinearLayout>

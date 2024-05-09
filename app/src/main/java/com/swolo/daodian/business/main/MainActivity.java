@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
@@ -21,6 +22,8 @@ import com.gprinter.utils.Command;
 import com.gprinter.utils.ConnMethod;
 import com.gprinter.utils.LogUtils;
 import com.swolo.daodian.R;
+import com.swolo.daodian.business.order.OrderListActivity;
+import com.swolo.daodian.ui.ActivityUtil;
 import com.swolo.daodian.ui.BaseActivity;
 
 import java.io.IOException;
@@ -28,6 +31,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import pub.devrel.easypermissions.EasyPermissions;
+
+/**
+ * 长连接参考：
+ * https://github.com/kongzue/BaseOkHttpV3?tab=readme-ov-file#websocket
+ */
 
 public class MainActivity extends BaseActivity {
 
@@ -185,6 +193,7 @@ public class MainActivity extends BaseActivity {
                             @Override
                             public void onSuccess(PrinterDevices printerDevices) {
                                 notifyState("已连接\n");
+                                checkPrinter();
                             }
 
                             @Override
@@ -205,7 +214,6 @@ public class MainActivity extends BaseActivity {
                         .build();
                 printer = Printer.getInstance();
                 printer.connect(usb);
-                checkPrinter();
                 return true;
             }
         } else {
@@ -241,22 +249,9 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    boolean checkUsbDevicePidVid(UsbDevice dev) {
-        int pid = dev.getProductId();
-        int vid = dev.getVendorId();
-        return ((vid == 34918 && pid == 256) || (vid == 1137 && pid == 85)
-                || (vid == 6790 && pid == 30084)
-                || (vid == 26728 && pid == 256) || (vid == 26728 && pid == 512)
-                || (vid == 26728 && pid == 256) || (vid == 26728 && pid == 768)
-                || (vid == 26728 && pid == 1024) || (vid == 26728 && pid == 1280)
-                || (vid == 26728 && pid == 1536));
-    }
-
-
     /**
-     * 打印案例
-     *
-     * @param view
+     * 打印方法
+     * 获取到实时订单，调用该方法
      */
     public void print(View view) {
         ThreadPoolManager.getInstance().addTask(new Runnable() {
@@ -282,9 +277,10 @@ public class MainActivity extends BaseActivity {
 //                        }
 //                    }
                     //***************************************************************
-                    // TODO 修复
+                    // TODO 在这里修改打印样式
                     boolean result = printer.getPortManager().writeDataImmediately(PrintContent.getLabel(context, 3));
                     if (result) {
+                        // TODO 打印成功后，要告知server
                         tipsDialog("发送成功");
                     } else {
                         tipsDialog("发送失败");
@@ -302,6 +298,10 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+    }
+
+    public void jumpOrderList(View view) {
+        ActivityUtil.next(this, OrderListActivity.class);
     }
 
     /**
