@@ -13,7 +13,7 @@ public class UserResult extends BaseResult {
     public class Data implements NoProguard {
 
 
-        public Integer nxCommunityUserId;
+        public int nxCommunityUserId;
         /**
          *  用户名
          */
@@ -33,15 +33,15 @@ public class UserResult extends BaseResult {
         /**
          *
          */
-        public Integer nxCouCommunityId;
+        public int nxCouCommunityId;
         public Boolean socketOn;
         /**
          *
          */
-        public Integer nxCouAdmin;
+        public int nxCouAdmin;
 
-        public String nxCouCode;
-        public Integer nxCouRoleId;
-        public Integer nxCouWorkingStatus;
+        public int nxCouCode;
+        public int nxCouRoleId;
+        public int nxCouWorkingStatus;
     }
 }

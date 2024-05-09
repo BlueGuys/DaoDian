@@ -10,6 +10,7 @@ import com.kongzue.baseokhttp.util.Parameter;
 import com.swolo.daodian.AccountManager;
 import com.swolo.daodian.R;
 import com.swolo.daodian.network.NetworkConfig;
+import com.swolo.daodian.ui.ActivityUtil;
 import com.swolo.daodian.ui.BaseActivity;
 import com.swolo.daodian.utils.GsonUtils;
 import com.swolo.daodian.utils.StringUtils;
@@ -42,7 +43,8 @@ public class LoginActivity extends BaseActivity {
                     UserResult result = GsonUtils.gsonResolve(main, UserResult.class);
                     if (result.isSuccessful()) {
                         showToast("登录成功！");
-                        AccountManager.getInstance().setUserInfo(GsonUtils.toJson(result.data));
+                        AccountManager.getInstance().setUserInfo(GsonUtils.toJson(result));
+                        ActivityUtil.goBack(LoginActivity.this);
                     } else {
                         showToast(result.getMsg());
                     }

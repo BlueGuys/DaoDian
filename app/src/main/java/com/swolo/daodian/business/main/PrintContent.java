@@ -24,6 +24,52 @@ import java.util.Vector;
  * Description: 打印内容
  */
 public class PrintContent {
+
+    /**
+     * 标签打印测试页
+     *
+     * @return
+     */
+    public static Vector<Byte> getOrderLabel(Context context, int gap, NewOrderResult.Order order) {
+        LabelCommand tsc = new LabelCommand();
+        /* 设置标签尺寸，按照实际尺寸设置 */
+        tsc.addSize(40, 60);
+        /* 设置标签间隙，按照实际尺寸设置，如果为无间隙纸则设置为0 */
+        tsc.addGap(10);
+        /* 设置打印方向 */
+        tsc.addDirection(LabelCommand.DIRECTION.FORWARD, LabelCommand.MIRROR.NORMAL);
+        /* 开启带Response的打印，用于连续打印 */
+        tsc.addQueryPrinterStatus(LabelCommand.RESPONSE_MODE.ON);
+        /* 设置原点坐标 */
+        tsc.addReference(0, 0);
+        /* 清除打印缓冲区 */
+        tsc.addCls();
+        /* 绘制简体中文 */
+        // 商品名称
+        tsc.addText(70, 400, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2,
+                order.orderGoodsName);
+        // 取餐号
+        tsc.addText(70, 140, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2,
+                order.orderPickupNumber);
+        // 规格
+        tsc.addText(130, 400, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,
+                order.orderId);
+        // 备注
+        String remark = order.remark;
+        if (remark != null) {
+            tsc.addText(270, 400, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_2,
+                    "备注:" + remark);
+        }
+
+        /* 打印标签 */
+        tsc.addPrint(1, 1);
+        /* 打印标签后 蜂鸣器响 */
+
+        tsc.addSound(2, 100);
+        tsc.addCashdrwer(LabelCommand.FOOT.F5, 255, 255);
+        return tsc.getCommand();
+    }
+
     /**
      * 标签打印测试页
      *

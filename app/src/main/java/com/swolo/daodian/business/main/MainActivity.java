@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
@@ -12,6 +11,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,14 +21,25 @@ import com.gprinter.utils.CallbackListener;
 import com.gprinter.utils.Command;
 import com.gprinter.utils.ConnMethod;
 import com.gprinter.utils.LogUtils;
+import com.kongzue.baseokhttp.HttpRequest;
+import com.kongzue.baseokhttp.listener.ResponseListener;
+import com.kongzue.baseokhttp.util.Parameter;
+import com.swolo.daodian.AccountManager;
 import com.swolo.daodian.R;
+import com.swolo.daodian.business.login.LoginActivity;
+import com.swolo.daodian.business.login.UserResult;
 import com.swolo.daodian.business.order.OrderListActivity;
+import com.swolo.daodian.network.NetworkConfig;
 import com.swolo.daodian.ui.ActivityUtil;
 import com.swolo.daodian.ui.BaseActivity;
+import com.swolo.daodian.utils.GsonUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -39,13 +50,20 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends BaseActivity {
 
+    private LinearLayout linearSetting;
     private TextView textViewUSB;
 
     Context context;
 
     private Printer printer = null;
+    private int nxCommunityUserId;
 
-    private StringBuilder mStateStringBuilder = new StringBuilder();
+    public static final String TAG = MainActivity.class.getName();
+
+    private final StringBuilder mStateStringBuilder = new StringBuilder();
+
+    private static final int DELAY = 100;
+    private Timer mTimer;
 
     Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -129,8 +147,101 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = MainActivity.this;
+        linearSetting = findViewById(R.id.linear_setting);
         textViewUSB = findViewById(R.id.tv_usb);
         init(null);
+        if (AccountManager.getInstance().isLogin()) {
+            String userInfoStr = AccountManager.getInstance().getUserInfo();
+            UserResult result = GsonUtils.gsonResolve(userInfoStr, UserResult.class);
+            nxCommunityUserId = result.data.nxCommunityUserId;
+        } else {
+            ActivityUtil.next(this, LoginActivity.class);
+        }
+        mTimer = new Timer();
+        TimerTask mTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+//                requestNewestOrder();
+            }
+        };
+        mTimer.schedule(mTimerTask, 0, 5 * 1000);
+        requestNewestOrder();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    /**
+     * 请求未打印订单
+     */
+    private void requestNewestOrder() {
+        HttpRequest.POST(MainActivity.this, NetworkConfig.getNewOrderUrl(), new Parameter().add("comId", String.valueOf(nxCommunityUserId)).add("status", "2"), new ResponseListener() {
+            @Override
+            public void onResponse(String main, Exception error) {
+                NewOrderResult result = GsonUtils.gsonResolve(main, NewOrderResult.class);
+                String str = "{\n" +
+                        "\t\"code\": 0,\n" +
+                        "\t\"data\": {\n" +
+                        "\t\t\"orderList\": [{\n" +
+                        "\t\t\t\"orderId\": \"1234\",\n" +
+                        "\t\t\t\"orderPickupNumber\": \"555\",\n" +
+                        "\t\t\t\"orderGoodsName\": \"商品名称\",\n" +
+                        "\t\t\t\"orderGoodsCount\": 3\n" +
+                        "\t\t}]\n" +
+                        "\t}\n" +
+                        "}";
+                result = GsonUtils.gsonResolve(str, NewOrderResult.class);
+                if (result != null && result.isSuccessful()) {
+                    // TODO 声音
+                    ArrayList<NewOrderResult.Order> orders = result.data.orderList;
+                    for (int i = 0; i < orders.size(); i++) {
+                        printOrder(orders.get(i));
+                    }
+                }
+            }
+        });
+    }
+
+    public void printOrder(NewOrderResult.Order order) {
+        ThreadPoolManager.getInstance().addTask(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (printer.getPortManager() == null) {
+                        tipsToast("请先连接打印机");
+                        return;
+                    }
+                    // TODO 在这里修改打印样式
+                    boolean result = printer.getPortManager().writeDataImmediately(PrintContent.getOrderLabel(context, 3, order));
+                    if (result) {
+                        // TODO 打印成功后，要告知server
+                        tipsDialog("发送成功");
+                    } else {
+                        tipsDialog("发送失败");
+                    }
+                    LogUtils.e("send result", result);
+                } catch (IOException e) {
+                    tipsDialog("打印失败" + e.getMessage());
+                } catch (Exception e) {
+                    tipsDialog("打印失败" + e.getMessage());
+                } finally {
+                    if (printer.getPortManager() == null) {
+                        printer.close();
+                    }
+                }
+            }
+        });
+
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        if (mTimer != null) {
+            mTimer.cancel();
+        }
     }
 
     public void init(View view) {
@@ -242,7 +353,7 @@ public class MainActivity extends BaseActivity {
                     msg.what = 0x01;
                     msg.arg1 = status;
                     handler.sendMessage(msg);
-                }  catch (Exception e) {
+                } catch (Exception e) {
                     notifyState("状态获取异常\n" + e.getMessage());
                 }
             }
@@ -253,18 +364,16 @@ public class MainActivity extends BaseActivity {
      * 打印方法
      * 获取到实时订单，调用该方法
      */
-    public void print(View view) {
-        ThreadPoolManager.getInstance().addTask(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (printer.getPortManager() == null) {
-                        tipsToast("请先连接打印机");
-                        return;
-                    }
-                    // TODO
-                    //打印前后查询打印机状态，部分老款打印机不支持查询请去除下面查询代码
-                    //******************     查询状态     ***************************
+    public void testPrint(View view) {
+        ThreadPoolManager.getInstance().addTask(() -> {
+            try {
+                if (printer.getPortManager() == null) {
+                    tipsToast("请先连接打印机");
+                    return;
+                }
+                // TODO
+                //打印前后查询打印机状态，部分老款打印机不支持查询请去除下面查询代码
+                //******************     查询状态     ***************************
 //                    if (swState.isChecked()) {
 //                        Command command = printer.getPortManager().getCommand();
 //                        int status = printer.getPrinterState(command,2000);
@@ -276,24 +385,23 @@ public class MainActivity extends BaseActivity {
 //                            return;
 //                        }
 //                    }
-                    //***************************************************************
-                    // TODO 在这里修改打印样式
-                    boolean result = printer.getPortManager().writeDataImmediately(PrintContent.getLabel(context, 3));
-                    if (result) {
-                        // TODO 打印成功后，要告知server
-                        tipsDialog("发送成功");
-                    } else {
-                        tipsDialog("发送失败");
-                    }
-                    LogUtils.e("send result", result);
-                } catch (IOException e) {
-                    tipsDialog("打印失败" + e.getMessage());
-                } catch (Exception e) {
-                    tipsDialog("打印失败" + e.getMessage());
-                } finally {
-                    if (printer.getPortManager() == null) {
-                        printer.close();
-                    }
+                //***************************************************************
+                // TODO 在这里修改打印样式
+                boolean result = printer.getPortManager().writeDataImmediately(PrintContent.getLabel(context, 3));
+                if (result) {
+                    // TODO 打印成功后，要告知server
+                    tipsDialog("发送成功");
+                } else {
+                    tipsDialog("发送失败");
+                }
+                LogUtils.e("send result", result);
+            } catch (IOException e) {
+                tipsDialog("打印失败" + e.getMessage());
+            } catch (Exception e) {
+                tipsDialog("打印失败" + e.getMessage());
+            } finally {
+                if (printer.getPortManager() == null) {
+                    printer.close();
                 }
             }
         });
@@ -302,6 +410,14 @@ public class MainActivity extends BaseActivity {
 
     public void jumpOrderList(View view) {
         ActivityUtil.next(this, OrderListActivity.class);
+    }
+
+    public void printSetting(View view) {
+        linearSetting.setVisibility(View.VISIBLE);
+    }
+
+    public void hideSetting(View view) {
+        linearSetting.setVisibility(View.GONE);
     }
 
     /**
