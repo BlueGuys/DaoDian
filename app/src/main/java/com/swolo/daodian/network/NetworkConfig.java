@@ -15,8 +15,15 @@ public class NetworkConfig {
     /**
      * 获取未打印订单
      */
-    public static String getNewOrderUrl() {
-        return BASE_URL + "api/nxorders/getStatusCommOrder";
+    public static String getUnPrintSubOrderUrl() {
+        return BASE_URL + "api/nxorderssub/getUnPrintSubOrders";
+    }
+
+    /**
+     * 提交订单
+     */
+    public static String getCommitSubOrders() {
+        return BASE_URL + "api/nxorderssub/printSubOrders";
     }
 
     /**

@@ -31,7 +31,6 @@ public class LoginActivity extends BaseActivity {
 
     private void login() {
         String userPhoneNumber = etUserPhone.getText().toString();
-        userPhoneNumber = "123";
         if (StringUtils.isEmpty(userPhoneNumber)) {
             showToast("请输入手机号");
         } else {

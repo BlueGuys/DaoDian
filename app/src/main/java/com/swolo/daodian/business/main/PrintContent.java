@@ -46,16 +46,13 @@ public class PrintContent {
         tsc.addCls();
         /* 绘制简体中文 */
         // 商品名称
-        tsc.addText(70, 400, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2,
-                order.orderGoodsName);
-        // 取餐号
-        tsc.addText(70, 140, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2,
-                order.orderPickupNumber);
+        tsc.addText(70, 400, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2, order.nxCommunityGoodsEntity.nxCgGoodsName);
         // 规格
-        tsc.addText(130, 400, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,
-                order.orderId);
+        tsc.addText(70, 140, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2, order.nxCospQuantity);
+        // 取餐号
+        tsc.addText(130, 400, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_4, LabelCommand.FONTMUL.MUL_4, order.nxCospPickUpCode);
         // 备注
-        String remark = order.remark;
+        String remark = order.nxCospRemark;
         if (remark != null) {
             tsc.addText(270, 400, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_2,
                     "备注:" + remark);

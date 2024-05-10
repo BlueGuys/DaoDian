@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class NewOrderResult extends BaseResult {
 
-    public Data data;
+    public ArrayList<Order> data;
 
     public static class Data implements NoProguard {
 
@@ -21,12 +21,28 @@ public class NewOrderResult extends BaseResult {
 
     public static class Order implements NoProguard {
 
-        public String orderId;
-        public String orderPickupNumber;
-        public String orderGoodsName;
-        public String orderGoodsCount;
-        public String remark;
+        public String nxCommunityOrdersPrintSubId;
+        /**
+         * 取餐号
+         */
+        public String nxCospPickUpCode;
 
+        public NxCommunityGoodsEntity nxCommunityGoodsEntity;
+        /**
+         * 数量
+         */
+        public String nxCospQuantity;
+        /**
+         * 备注
+         */
+        public String nxCospRemark;
+    }
+
+    public static class NxCommunityGoodsEntity implements NoProguard {
+        /**
+         * 商品名称
+         */
+        public String nxCgGoodsName;
     }
 
 }

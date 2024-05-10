@@ -15,7 +15,7 @@
             android:layout_height="match_parent"
             android:paddingHorizontal="15dp"
             android:gravity="center"
-            android:text="设置"
+            android:text="检查打印机"
             android:onClick="printSetting"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
@@ -38,6 +38,7 @@
             android:paddingHorizontal="15dp"
             android:gravity="center"
             android:text="已打印"
+            android:visibility="gone"
             android:onClick="jumpOrderList"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
@@ -51,6 +52,25 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/black" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:padding="15dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="新订单："/>
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listview_order"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="15dp"
+        android:layout_weight="1"/>
 
     <LinearLayout
         android:id="@+id/linear_setting"
@@ -113,19 +133,6 @@
 
         </LinearLayout>
 
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="15dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="新订单产生，这里展示打印进度，打印动画："/>
 
     </LinearLayout>
 
