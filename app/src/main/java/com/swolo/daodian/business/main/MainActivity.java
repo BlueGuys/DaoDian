@@ -147,7 +147,6 @@ public class MainActivity extends BaseActivity {
         listView = findViewById(R.id.listview_order);
         orderListAdapter = new OrderListAdapter();
         listView.setAdapter(orderListAdapter);
-        init(null);
         if (AccountManager.getInstance().isLogin()) {
             String userInfoStr = AccountManager.getInstance().getUserInfo();
             UserResult result = GsonUtils.gsonResolve(userInfoStr, UserResult.class);
@@ -162,7 +161,7 @@ public class MainActivity extends BaseActivity {
                 requestNewestOrder();
             }
         };
-        mRequestTimer.schedule(mTimerTask, 0, 5 * 1000);
+        mRequestTimer.schedule(mTimerTask, 1000, 5 * 1000);
 
         mPrintTimer = new Timer();
         TimerTask printTak = new TimerTask() {
@@ -175,12 +174,14 @@ public class MainActivity extends BaseActivity {
                 }
             }
         };
-        mPrintTimer.schedule(printTak, 0, 5 * 1000);
+        mPrintTimer.schedule(printTak, 1000, 5 * 1000);
+        printer = Printer.getInstance();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        init(null);
     }
 
     /**
@@ -198,17 +199,16 @@ public class MainActivity extends BaseActivity {
                     if (list == null) {
                         return;
                     }
-                    if (orderArrayList.isEmpty()) {
-                        orderArrayList.addAll(list);
-                    } else {
-                        for (int j = 0; j < orderArrayList.size(); j++) {
-                            NewOrderResult.Order orderOrigin = orderArrayList.get(j);
-                            for (int i = 0; i < list.size(); i++) {
-                                NewOrderResult.Order order = list.get(i);
-                                if (!Objects.equals(orderOrigin.nxCommunityOrdersPrintSubId, order.nxCommunityOrdersPrintSubId)) {
-                                    orderArrayList.add(order);
-                                }
+                    for (int i = 0; i < list.size(); i++) {
+                        NewOrderResult.Order order = list.get(i);
+                        boolean hasContain = false;
+                        for(NewOrderResult.Order orderOrigin: orderArrayList) {
+                            if (Objects.equals(order.nxCommunityOrdersPrintSubId, orderOrigin.nxCommunityOrdersPrintSubId)) {
+                                hasContain = true;
                             }
+                        }
+                        if (!hasContain) {
+                            orderArrayList.add(order);
                         }
                     }
                     orderListAdapter.notify(orderArrayList);
@@ -216,6 +216,7 @@ public class MainActivity extends BaseActivity {
             }
         });
     }
+
 
     private void commitPrintOrder(NewOrderResult.Order order) {
         HttpRequest.POST(MainActivity.this, NetworkConfig.getCommitSubOrders(), new Parameter().add("subOrderId", order.nxCommunityOrdersPrintSubId).add("status", "2"), new ResponseListener() {
@@ -230,7 +231,6 @@ public class MainActivity extends BaseActivity {
             }
         });
     }
-
 
     public void printOrder(NewOrderResult.Order order) {
         Log.e(TAG, "打印新订单，当前订单数量：" + orderArrayList.size());
@@ -301,10 +301,12 @@ public class MainActivity extends BaseActivity {
         return false;
     }
 
+    private UsbManager manager;
+
     private boolean connectUSB() {
         notifyState("-------------------------------------------------\n");
         notifyState("2.USB检测:\n");
-        UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        manager = (UsbManager) getSystemService(Context.USB_SERVICE);
         // Get the list of attached devices
         HashMap<String, UsbDevice> devices = manager.getDeviceList();
         Iterator<UsbDevice> deviceIterator = devices.values().iterator();
@@ -351,8 +353,9 @@ public class MainActivity extends BaseActivity {
                             }
                         })
                         .build();
-                printer = Printer.getInstance();
-                printer.connect(usb);
+                if (printer != null) {
+                    printer.connect(usb);
+                }
                 return true;
             }
         } else {
@@ -382,6 +385,9 @@ public class MainActivity extends BaseActivity {
                     msg.arg1 = status;
                     handler.sendMessage(msg);
                 } catch (Exception e) {
+//                    if (printer.getPortManager() == null) {
+//                        printer.close();
+//                    }
                     notifyState("状态获取异常\n" + e.getMessage());
                 }
             }
@@ -424,12 +430,10 @@ public class MainActivity extends BaseActivity {
                 LogUtils.e("send result", result);
             } catch (IOException e) {
                 tipsDialog("打印失败" + e.getMessage());
+                notifyState("打印失败" + e.getMessage());
             } catch (Exception e) {
                 tipsDialog("打印失败" + e.getMessage());
-            } finally {
-                if (printer.getPortManager() == null) {
-                    printer.close();
-                }
+                notifyState("打印失败" + e.getMessage());
             }
         });
 
