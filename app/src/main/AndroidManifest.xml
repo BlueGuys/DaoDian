@@ -55,15 +55,7 @@
         <activity android:name=".business.order.OrderListActivity"/>
         <activity android:name=".business.order.OrderDetailActivity"/>
         <activity android:name=".business.usb.UsbDeviceActivity"/>
-        <service
-            android:name=".im.JWebSocketClientService"
-            android:enabled="true"
-            android:exported="true" />
-        <service
-            android:name=".im.JWebSocketClientService$GrayInnerService"
-            android:enabled="true"
-            android:exported="false"
-            android:process=":gray" />
+        <service android:name=".business.main.PrintService"/>
     </application>
 
 </manifest>

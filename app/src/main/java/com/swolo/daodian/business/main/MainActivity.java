@@ -175,62 +175,30 @@ public class MainActivity extends BaseActivity {
             }
         };
         mPrintTimer.schedule(printTak, 1000, 5 * 1000);
-        printer = Printer.getInstance();
+        getAvailableUSB();
+        checkPermission();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        init(null);
-    }
-
-    /**
-     * 请求未打印订单
-     */
-    private void requestNewestOrder() {
-        Log.e(TAG, "获取新订单");
-        HttpRequest.POST(MainActivity.this, NetworkConfig.getUnPrintSubOrderUrl(), new Parameter().add("commId", String.valueOf(nxCommunityUserId)).add("status", "1"), new ResponseListener() {
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onResponse(String main, Exception error) {
-                NewOrderResult result = GsonUtils.gsonResolve(main, NewOrderResult.class);
-                Log.e(TAG, "获取新订单");
-                if (result != null && result.isSuccessful()) {
-                    ArrayList<NewOrderResult.Order> list = result.data;
-                    if (list == null) {
-                        return;
-                    }
-                    for (int i = 0; i < list.size(); i++) {
-                        NewOrderResult.Order order = list.get(i);
-                        boolean hasContain = false;
-                        for(NewOrderResult.Order orderOrigin: orderArrayList) {
-                            if (Objects.equals(order.nxCommunityOrdersPrintSubId, orderOrigin.nxCommunityOrdersPrintSubId)) {
-                                hasContain = true;
-                            }
-                        }
-                        if (!hasContain) {
-                            orderArrayList.add(order);
-                        }
-                    }
-                    orderListAdapter.notify(orderArrayList);
-                }
+            public void run() {
+                connectUSB();
             }
-        });
+        }, 2000);
     }
 
-
-    private void commitPrintOrder(NewOrderResult.Order order) {
-        HttpRequest.POST(MainActivity.this, NetworkConfig.getCommitSubOrders(), new Parameter().add("subOrderId", order.nxCommunityOrdersPrintSubId).add("status", "2"), new ResponseListener() {
-            @Override
-            public void onResponse(String main, Exception error) {
-                PrintOrderResult result = GsonUtils.gsonResolve(main, PrintOrderResult.class);
-                Log.e(TAG, "获取新订单");
-                if (result != null && result.isSuccessful()) {
-                    orderArrayList.remove(order);
-                    orderListAdapter.notify(orderArrayList);
-                }
-            }
-        });
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (printer.getPortManager() != null) {
+            printer.close();
+            notifyState("打印机断开连接");
+        }
     }
+
 
     public void printOrder(NewOrderResult.Order order) {
         Log.e(TAG, "打印新订单，当前订单数量：" + orderArrayList.size());
@@ -258,7 +226,6 @@ public class MainActivity extends BaseActivity {
                 }
             }
         });
-
     }
 
     @Override
@@ -274,7 +241,6 @@ public class MainActivity extends BaseActivity {
 
     public void init(View view) {
         mStateStringBuilder.delete(0, mStateStringBuilder.length());
-        checkPermission();
         connectUSB();
     }
 
@@ -283,120 +249,172 @@ public class MainActivity extends BaseActivity {
         textViewUSB.setText(mStateStringBuilder.toString());
     }
 
-    private boolean checkPermission() {
-        notifyState("1.权限检测:\n");
-        if (EasyPermissions.hasPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE) && EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+    private void checkPermission() {
+        notifyState("-------------------------------------------------\n");
+        notifyState("2.权限检测:\n");
+        boolean hasStorage = EasyPermissions.hasPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (hasStorage) {
             notifyState("存储权限:OK\n");
-            notifyState("位置权限:OK\n");
-            return true;
+        } else {
+            EasyPermissions.requestPermissions(this, "权限申请原理对话框 : 描述申请权限的原理", 100, Manifest.permission.READ_EXTERNAL_STORAGE);
         }
-        EasyPermissions.requestPermissions(
-                this,
-                "权限申请原理对话框 : 描述申请权限的原理",
-                100,
-                // 下面是要申请的权限 可变参数列表
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.ACCESS_FINE_LOCATION
-        );
-        return false;
+        boolean hasLocation = EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        if (hasLocation) {
+            notifyState("位置权限:OK\n");
+        } else {
+            EasyPermissions.requestPermissions(this, "权限申请原理对话框 : 描述申请权限的原理", 100, Manifest.permission.ACCESS_FINE_LOCATION);
+        }
     }
 
-    private UsbManager manager;
 
-    private boolean connectUSB() {
+    private PrinterDevices mUsb;
+
+    /**
+     * 获取可用的usb
+     */
+    private void getAvailableUSB() {
+        //如果打印机持有的端口管理器为空，则重新连接
         notifyState("-------------------------------------------------\n");
-        notifyState("2.USB检测:\n");
-        manager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        // Get the list of attached devices
+        notifyState("1.获取USB:\n");
+        notifyState("onCreate 寻找设备的USB端口...\n");
+        UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
         HashMap<String, UsbDevice> devices = manager.getDeviceList();
         Iterator<UsbDevice> deviceIterator = devices.values().iterator();
         int count = devices.size();
-        if (count > 0) {
-            while (deviceIterator.hasNext()) {
-                UsbDevice usbDevice = deviceIterator.next();
-                String deviceName = usbDevice.getDeviceName();
-                PrinterDevices usb = new PrinterDevices.Build()
-                        .setContext(MainActivity.this)
-                        .setConnMethod(ConnMethod.USB)
-                        .setUsbDevice(usbDevice)
-                        .setCommand(Command.TSC)
-                        .setCallbackListener(new CallbackListener() {
-                            @Override
-                            public void onConnecting() {
-                                notifyState("连接中...\n");
-                            }
-
-                            @Override
-                            public void onCheckCommand() {
-                                notifyState("查询中...\n");
-                            }
-
-                            @Override
-                            public void onSuccess(PrinterDevices printerDevices) {
-                                notifyState("已连接\n");
-                                checkPrinter();
-                            }
-
-                            @Override
-                            public void onReceive(byte[] data) {
-                                notifyState("连接中...\n");
-                            }
-
-                            @Override
-                            public void onFailure() {
-                                notifyState("连接失败...\n");
-                            }
-
-                            @Override
-                            public void onDisconnect() {
-                                notifyState("断开连接...\n");
-                            }
-                        })
-                        .build();
-                if (printer != null) {
-                    printer.connect(usb);
-                }
-                return true;
-            }
-        } else {
-            notifyState("usb连接失败");
+        if (count == 0) {
+            notifyState("获取到可用的usb端口数量为0\n");
+            return;
         }
-        return false;
+        while (deviceIterator.hasNext()) {
+            UsbDevice usbDevice = deviceIterator.next();
+            String deviceName = usbDevice.getDeviceName();
+            notifyState("获取到的usb:" + deviceName + "\n");
+            this.mUsb = new PrinterDevices.Build()
+                    .setContext(MainActivity.this)
+                    .setConnMethod(ConnMethod.USB)
+                    .setUsbDevice(usbDevice)
+                    .setCommand(Command.TSC)
+                    .setCallbackListener(new CallbackListener() {
+                        @Override
+                        public void onConnecting() {
+                            notifyState("连接中...\n");
+                        }
+
+                        @Override
+                        public void onCheckCommand() {
+                            notifyState("查询中...\n");
+                        }
+
+                        @Override
+                        public void onSuccess(PrinterDevices printerDevices) {
+                            notifyState("已连接\n");
+                            checkPrinter();
+                        }
+
+                        @Override
+                        public void onReceive(byte[] data) {
+                            notifyState("连接中...\n");
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            notifyState("连接失败...\n");
+                        }
+
+                        @Override
+                        public void onDisconnect() {
+                            notifyState("断开连接...\n");
+                        }
+                    })
+                    .build();
+        }
+    }
+
+    private void connectUSB() {
+        notifyState("-------------------------------------------------\n");
+        notifyState("3.连接打印机:\n");
+        //如果打印机持有的端口管理器不为空，则检查状态
+        if (printer.getPortManager() != null) {
+            notifyState("主动断开打印机\n");
+            printer.close();
+        }
+        if (this.mUsb != null) {
+            notifyState("打印机连接：Printer.connect(usb)\n");
+            Printer.connect(this.mUsb);
+        } else {
+            notifyState("打印机连接：Printer.connect(usb) this.mUsb == null\n");
+        }
     }
 
     /**
-     * 检查标签打印机状态
+     * 请求未打印订单
      */
-    public void checkPrinter() {
-        notifyState("-------------------------------------------------\n");
-        notifyState("3.打印机检测:\n");
-        ThreadPoolManager.getInstance().addTask(new Runnable() {
+    private void requestNewestOrder() {
+        HttpRequest.POST(MainActivity.this, NetworkConfig.getUnPrintSubOrderUrl(), new Parameter().add("commId", String.valueOf(nxCommunityUserId)).add("status", "1"), new ResponseListener() {
             @Override
-            public void run() {
-                if (printer.getPortManager() == null) {
-                    notifyState("请先连接打印机\n");
-                    return;
+            public void onResponse(String main, Exception error) {
+                NewOrderResult result = GsonUtils.gsonResolve(main, NewOrderResult.class);
+                if (result != null && result.isSuccessful()) {
+                    ArrayList<NewOrderResult.Order> list = result.data;
+                    if (list == null) {
+                        return;
+                    }
+                    for (int i = 0; i < list.size(); i++) {
+                        NewOrderResult.Order order = list.get(i);
+                        boolean hasContain = false;
+                        for (NewOrderResult.Order orderOrigin : orderArrayList) {
+                            if (Objects.equals(order.nxCommunityOrdersPrintSubId, orderOrigin.nxCommunityOrdersPrintSubId)) {
+                                hasContain = true;
+                            }
+                        }
+                        if (!hasContain) {
+                            orderArrayList.add(order);
+                        }
+                    }
+                    orderListAdapter.notify(orderArrayList);
                 }
-                try {
-                    Command command = printer.getPortManager().getCommand();
-                    int status = printer.getPrinterState(command, 2000);
-                    Message msg = new Message();
-                    msg.what = 0x01;
-                    msg.arg1 = status;
-                    handler.sendMessage(msg);
-                } catch (Exception e) {
-//                    if (printer.getPortManager() == null) {
-//                        printer.close();
-//                    }
-                    notifyState("状态获取异常\n" + e.getMessage());
+            }
+        });
+    }
+
+    private void commitPrintOrder(NewOrderResult.Order order) {
+        HttpRequest.POST(MainActivity.this, NetworkConfig.getCommitSubOrders(), new Parameter().add("subOrderId", order.nxCommunityOrdersPrintSubId).add("status", "2"), new ResponseListener() {
+            @Override
+            public void onResponse(String main, Exception error) {
+                PrintOrderResult result = GsonUtils.gsonResolve(main, PrintOrderResult.class);
+                Log.e(TAG, "获取新订单");
+                if (result != null && result.isSuccessful()) {
+                    orderArrayList.remove(order);
+                    orderListAdapter.notify(orderArrayList);
                 }
             }
         });
     }
 
     /**
-     * 打印方法
-     * 获取到实时订单，调用该方法
+     * 检查标签打印机状态
+     */
+    public void checkPrinter() {
+        notifyState("检测打印机状态\n");
+        if (printer.getPortManager() == null) {
+            notifyState("请先连接打印机\n");
+            return;
+        }
+        ThreadPoolManager.getInstance().addTask(() -> {
+            try {
+                Command command = printer.getPortManager().getCommand();
+                int status = printer.getPrinterState(command, 2000);
+                Message msg = new Message();
+                msg.what = 0x01;
+                msg.arg1 = status;
+                handler.sendMessage(msg);
+            } catch (Exception e) {
+            }
+        });
+    }
+
+    /**
+     * 打印样张
      */
     public void testPrint(View view) {
         ThreadPoolManager.getInstance().addTask(() -> {
@@ -405,24 +423,8 @@ public class MainActivity extends BaseActivity {
                     tipsToast("请先连接打印机");
                     return;
                 }
-                // TODO
-                //打印前后查询打印机状态，部分老款打印机不支持查询请去除下面查询代码
-                //******************     查询状态     ***************************
-//                    if (swState.isChecked()) {
-//                        Command command = printer.getPortManager().getCommand();
-//                        int status = printer.getPrinterState(command,2000);
-//                        if (status != 0) {//打印机处于不正常状态,则不发送打印任务
-//                            Message msg = new Message();
-//                            msg.what = 0x01;
-//                            msg.arg1 = status;
-//                            handler.sendMessage(msg);
-//                            return;
-//                        }
-//                    }
-                //***************************************************************
                 boolean result = printer.getPortManager().writeDataImmediately(PrintContent.getLabel(context, 3));
                 if (result) {
-                    // TODO 打印成功后，要告知server
                     tipsDialog("发送成功");
                 } else {
                     tipsDialog("发送失败");
@@ -430,10 +432,12 @@ public class MainActivity extends BaseActivity {
                 LogUtils.e("send result", result);
             } catch (IOException e) {
                 tipsDialog("打印失败" + e.getMessage());
-                notifyState("打印失败" + e.getMessage());
             } catch (Exception e) {
                 tipsDialog("打印失败" + e.getMessage());
-                notifyState("打印失败" + e.getMessage());
+            } finally {
+                if (printer.getPortManager() == null) {
+                    printer.close();
+                }
             }
         });
 
