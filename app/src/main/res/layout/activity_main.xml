@@ -65,7 +65,7 @@
         android:layout_margin="15dp"
         android:background="@drawable/common_linear"
         android:orientation="vertical"
-        android:visibility="gone">
+        >
 
         <TextView
             android:layout_width="wrap_content"
@@ -96,8 +96,8 @@
                 android:layout_width="100dp"
                 android:layout_height="44dp"
                 android:background="@drawable/common_btn_selector"
-                android:onClick="init"
-                android:text="重连打印机"
+                android:onClick="connectPrint"
+                android:text="连接打印机"
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_size_16" />
 
