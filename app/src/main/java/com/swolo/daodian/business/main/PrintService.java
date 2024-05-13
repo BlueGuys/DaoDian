@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -22,6 +25,7 @@ import com.gprinter.utils.LogUtils;
 import com.kongzue.baseokhttp.HttpRequest;
 import com.kongzue.baseokhttp.listener.ResponseListener;
 import com.kongzue.baseokhttp.util.Parameter;
+import com.swolo.daodian.R;
 import com.swolo.daodian.network.NetworkConfig;
 import com.swolo.daodian.utils.GsonUtils;
 
@@ -82,6 +86,8 @@ public class PrintService extends Service {
         Log.e(TAG, "NormalServices constructor.");
     }
 
+    private MediaPlayer mMediaPlayer;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -107,6 +113,7 @@ public class PrintService extends Service {
             }
         };
         mPrintTimer.schedule(printTak, 1000, 5 * 1000);
+        mMediaPlayer = MediaPlayer.create(this, R.raw.bird);
     }
 
     public void printOrder(NewOrderResult.Order order) {
@@ -129,10 +136,6 @@ public class PrintService extends Service {
                 tipsToast("打印失败" + e.getMessage() + "\n");
             } catch (Exception e) {
                 tipsToast("打印失败" + e.getMessage() + "\n");
-            } finally {
-                if (printer.getPortManager() == null) {
-                    printer.close();
-                }
             }
         });
     }
@@ -182,6 +185,12 @@ public class PrintService extends Service {
         //如果打印机持有的端口管理器为空，则重新连接
         notifyState("-------------------------------------------------\n");
         notifyState("1.连接打印机:\n");
+        notifyState("先关闭打印机，等待2.20s\n");
+        Printer.close();
+        try {
+            Thread.sleep(2200);
+        } catch (InterruptedException e) {
+        }
         notifyState("寻找设备的USB端口...\n");
         UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
         HashMap<String, UsbDevice> devices = manager.getDeviceList();
@@ -191,10 +200,11 @@ public class PrintService extends Service {
             notifyState("获取到可用的usb端口数量为0\n");
             return;
         }
+        notifyState("获取到可用的usb端口数量为:" + count + "\n");
         while (deviceIterator.hasNext()) {
             UsbDevice usbDevice = deviceIterator.next();
             String deviceName = usbDevice.getDeviceName();
-            notifyState("获取到的usb:" + deviceName + "\n");
+            notifyState("获取到的usb:" + deviceName + "Vid="+ usbDevice.getVendorId() + "pid="+ usbDevice.getProductId());
             PrinterDevices usb = new PrinterDevices.Build()
                     .setContext(PrintService.this)
                     .setConnMethod(ConnMethod.USB)
@@ -236,6 +246,22 @@ public class PrintService extends Service {
             notifyState("Printer.connect(usb)\n");
             Printer.connect(usb);
         }
+    }
+
+    /**
+     * 检查USB设备的PID与VID
+     * @param dev
+     * @return
+     */
+    boolean checkUsbDevicePidVid(UsbDevice dev) {
+        int pid = dev.getProductId();
+        int vid = dev.getVendorId();
+        return ((vid == 34918 && pid == 256) || (vid == 1137 && pid == 85)
+                || (vid == 6790 && pid == 30084)
+                || (vid == 26728 && pid == 256) || (vid == 26728 && pid == 512)
+                || (vid == 26728 && pid == 256) || (vid == 26728 && pid == 768)
+                || (vid == 26728 && pid == 1024) || (vid == 26728 && pid == 1280)
+                || (vid == 26728 && pid == 1536));
     }
 
     /**
@@ -286,6 +312,7 @@ public class PrintService extends Service {
                             orderArrayList.add(order);
                             mPrintServiceListener.onOrderListChange(orderArrayList);
                             Log.e(TAG, "发现新订单：" + order.nxCommunityOrdersPrintSubId);
+                            mMediaPlayer.start();
                         }
                     }
                 }

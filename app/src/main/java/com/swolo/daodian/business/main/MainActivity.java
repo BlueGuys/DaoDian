@@ -64,12 +64,7 @@ public class MainActivity extends BaseActivity {
 
                 @Override
                 public void onOrderListChange(ArrayList<NewOrderResult.Order> orders) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            orderListAdapter.notify(orders);
-                        }
-                    });
+                    runOnUiThread(() -> orderListAdapter.notify(orders));
                 }
 
                 @Override
@@ -106,12 +101,23 @@ public class MainActivity extends BaseActivity {
             String userInfoStr = AccountManager.getInstance().getUserInfo();
             UserResult result = GsonUtils.gsonResolve(userInfoStr, UserResult.class);
             nxCommunityUserId = result.data.nxCommunityUserId;
+            bindService(null);
         } else {
-            ActivityUtil.next(this, LoginActivity.class);
+            startActivityForResult(new Intent(this, LoginActivity.class), 100);
         }
         checkPermission();
         mStateStringBuilder.delete(0, mStateStringBuilder.length());
-        bindService(null);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100) {
+            String userInfoStr = AccountManager.getInstance().getUserInfo();
+            UserResult result = GsonUtils.gsonResolve(userInfoStr, UserResult.class);
+            nxCommunityUserId = result.data.nxCommunityUserId;
+            bindService(null);
+        }
     }
 
     @Override
@@ -124,7 +130,7 @@ public class MainActivity extends BaseActivity {
     public void bindService(View view) {
         Intent intent = new Intent();
         intent.setClass(MainActivity.this, PrintService.class);
-        intent.putExtra("userID", nxCommunityUserId);
+        intent.putExtra("userID", String.valueOf(nxCommunityUserId));
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
