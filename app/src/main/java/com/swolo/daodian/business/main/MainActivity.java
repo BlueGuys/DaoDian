@@ -77,6 +77,7 @@ public class MainActivity extends BaseActivity {
                 @Override
                 public void run() {
                     binder.connectPrinter();
+                    isFirst = false;
                 }
             }, 1000);
         }
@@ -107,6 +108,16 @@ public class MainActivity extends BaseActivity {
         }
         checkPermission();
         mStateStringBuilder.delete(0, mStateStringBuilder.length());
+    }
+
+    private boolean isFirst = true;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!isFirst && binder !=null) {
+            binder.connectPrinter();
+        }
     }
 
     @Override

@@ -326,7 +326,6 @@ public class PrintService extends Service {
             @Override
             public void onResponse(String main, Exception error) {
                 PrintOrderResult result = GsonUtils.gsonResolve(main, PrintOrderResult.class);
-                Log.e(TAG, "获取新订单");
                 if (result != null && result.isSuccessful()) {
                     orderArrayList.remove(order);
                     mPrintServiceListener.onOrderListChange(orderArrayList);
