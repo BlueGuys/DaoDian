@@ -67,12 +67,55 @@ public class PrintContent {
         return tsc.getCommand();
     }
 
+    public static Vector<Byte> getOrderLabel1(Context context, int gap, NewOrderResult.Order order) {
+        LabelCommand tsc = new LabelCommand();
+        /* 设置标签尺寸，按照实际尺寸设置 */
+        tsc.addSize(40, 60);
+        /* 设置标签间隙，按照实际尺寸设置，如果为无间隙纸则设置为0 */
+        tsc.addGap(10);
+        /* 设置打印方向 */
+        tsc.addDirection(LabelCommand.DIRECTION.FORWARD, LabelCommand.MIRROR.NORMAL);
+        /* 开启带Response的打印，用于连续打印 */
+        tsc.addQueryPrinterStatus(LabelCommand.RESPONSE_MODE.ON);
+        /* 设置原点坐标 */
+        tsc.addReference(0, 0);
+        /* 清除打印缓冲区 */
+        tsc.addCls();
+        /* 绘制简体中文 */
+        // 商品名称
+        tsc.addText(70, 400, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2, order.nxCommunityGoodsEntity.nxCgGoodsName);
+        // 规格
+        tsc.addText(70, 140, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2, order.nxCospQuantity);
+        // 取餐号
+        tsc.addText(130, 400, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_4, LabelCommand.FONTMUL.MUL_4, order.nxCospPickUpCode);
+        // 备注
+        String remark = order.nxCospRemark;
+        if (remark != null) {
+            if (remark.length() > 18) {
+                String str1 = remark.substring(0, 16);
+                String srt2 = remark.substring(16);
+                tsc.addText(220, 400, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "备注:" + str1);
+                tsc.addText(270, 400, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, srt2);
+            } else {
+                tsc.addText(240, 400, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_270, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_2, "备注:" + remark);
+            }
+        }
+
+        /* 打印标签 */
+        tsc.addPrint(1, 1);
+        /* 打印标签后 蜂鸣器响 */
+
+        tsc.addSound(2, 100);
+        tsc.addCashdrwer(LabelCommand.FOOT.F5, 255, 255);
+        return tsc.getCommand();
+    }
+
     /**
      * 标签打印测试页
      *
      * @return
      */
-    public static Vector<Byte> getLabel(Context context,int gap) {
+    public static Vector<Byte> getLabel(Context context, int gap) {
         LabelCommand tsc = new LabelCommand();
         // 设置标签尺寸宽高，按照实际尺寸设置 单位mm
         tsc.addUserCommand("\r\n");
@@ -95,27 +138,27 @@ public class PrintContent {
         tsc.addText(30, 20, LabelCommand.FONTTYPE.SIMPLIFIED_24_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,
                 "欢迎使用Printer");
         //打印繁体
-        tsc.addUnicodeText(30,50, LabelCommand.FONTTYPE.TRADITIONAL_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"BIG5碼繁體中文","BIG5");
+        tsc.addUnicodeText(30, 50, LabelCommand.FONTTYPE.TRADITIONAL_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "BIG5碼繁體中文", "BIG5");
         //打印韩文
-        tsc.addUnicodeText(30,80, LabelCommand.FONTTYPE.KOREAN, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"Korean 지아보 하성","EUC_KR");
+        tsc.addUnicodeText(30, 80, LabelCommand.FONTTYPE.KOREAN, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "Korean 지아보 하성", "EUC_KR");
         //英数字
-        tsc.addText(240,20, LabelCommand.FONTTYPE.FONT_1, LabelCommand.ROTATION.ROTATION_0,LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"1");
-        tsc.addText(250,20, LabelCommand.FONTTYPE.FONT_2, LabelCommand.ROTATION.ROTATION_0,LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"2");
-        tsc.addText(270,20, LabelCommand.FONTTYPE.FONT_3, LabelCommand.ROTATION.ROTATION_0,LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"3");
-        tsc.addText(300,20, LabelCommand.FONTTYPE.FONT_4, LabelCommand.ROTATION.ROTATION_0,LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"4");
-        tsc.addText(330,20, LabelCommand.FONTTYPE.FONT_5, LabelCommand.ROTATION.ROTATION_0,LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"5");
-        tsc.addText(240,40, LabelCommand.FONTTYPE.FONT_6, LabelCommand.ROTATION.ROTATION_0,LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"6");
-        tsc.addText(250,40, LabelCommand.FONTTYPE.FONT_7, LabelCommand.ROTATION.ROTATION_0,LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"7");
-        tsc.addText(270,40, LabelCommand.FONTTYPE.FONT_8, LabelCommand.ROTATION.ROTATION_0,LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"8");
-        tsc.addText(300,60, LabelCommand.FONTTYPE.FONT_9, LabelCommand.ROTATION.ROTATION_0,LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"9");
-        tsc.addText(330,80, LabelCommand.FONTTYPE.FONT_10, LabelCommand.ROTATION.ROTATION_0,LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"10");
+        tsc.addText(240, 20, LabelCommand.FONTTYPE.FONT_1, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "1");
+        tsc.addText(250, 20, LabelCommand.FONTTYPE.FONT_2, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "2");
+        tsc.addText(270, 20, LabelCommand.FONTTYPE.FONT_3, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "3");
+        tsc.addText(300, 20, LabelCommand.FONTTYPE.FONT_4, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "4");
+        tsc.addText(330, 20, LabelCommand.FONTTYPE.FONT_5, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "5");
+        tsc.addText(240, 40, LabelCommand.FONTTYPE.FONT_6, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "6");
+        tsc.addText(250, 40, LabelCommand.FONTTYPE.FONT_7, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "7");
+        tsc.addText(270, 40, LabelCommand.FONTTYPE.FONT_8, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "8");
+        tsc.addText(300, 60, LabelCommand.FONTTYPE.FONT_9, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "9");
+        tsc.addText(330, 80, LabelCommand.FONTTYPE.FONT_10, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "10");
         Bitmap b = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_priter);
         // 绘制图片
         tsc.drawImage(30, 100, 300, b);
-        Bitmap b2= BitmapFactory.decodeResource(context.getResources(), R.drawable.flower);
-        tsc.drawJPGImage(200,250,200,b2);
+        Bitmap b2 = BitmapFactory.decodeResource(context.getResources(), R.drawable.flower);
+        tsc.drawJPGImage(200, 250, 200, b2);
         //绘制二维码
-        tsc.addQRCode(30,250, LabelCommand.EEC.LEVEL_L, 5, LabelCommand.ROTATION.ROTATION_0, " www.smarnet.cc");
+        tsc.addQRCode(30, 250, LabelCommand.EEC.LEVEL_L, 5, LabelCommand.ROTATION.ROTATION_0, " www.smarnet.cc");
         // 绘制一维条码
         tsc.add1DBarcode(30, 380, LabelCommand.BARCODETYPE.CODE128, 80, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, "12345678");
         // 打印标签
@@ -132,6 +175,7 @@ public class PrintContent {
 
     /**
      * 获取图片
+     *
      * @param context
      * @return
      */
@@ -151,11 +195,13 @@ public class PrintContent {
         final Bitmap bitmap = convertViewToBitmap(v);
         return bitmap;
     }
+
     /**
      * mxl转bitmap图片
+     *
      * @return
      */
-    public static Bitmap convertViewToBitmap(View view){
+    public static Bitmap convertViewToBitmap(View view) {
         view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
         view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
         view.buildDrawingCache();
@@ -163,46 +209,49 @@ public class PrintContent {
         return bitmap;
     }
 
-    public static TableRow ctv(Context context, String name, int k, int n){
-        TableRow tb=new TableRow(context);
-        tb.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT ,TableLayout.LayoutParams.WRAP_CONTENT));
-        TextView tv1=new TextView(context);
-        tv1.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT ,TableRow.LayoutParams.WRAP_CONTENT));
+    public static TableRow ctv(Context context, String name, int k, int n) {
+        TableRow tb = new TableRow(context);
+        tb.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT));
+        TextView tv1 = new TextView(context);
+        tv1.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
         tv1.setText(name);
         tv1.setTextColor(Color.BLACK);
         tb.addView(tv1);
-        TextView tv2=new TextView(context);
-        tv2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT ,TableRow.LayoutParams.WRAP_CONTENT));
-        tv2.setText(k+"");
+        TextView tv2 = new TextView(context);
+        tv2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+        tv2.setText(k + "");
         tv2.setTextColor(Color.BLACK);
         tb.addView(tv2);
-        TextView tv3=new TextView(context);
-        tv3.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT ,TableRow.LayoutParams.WRAP_CONTENT));
-        tv3.setText(n+"");
+        TextView tv3 = new TextView(context);
+        tv3.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+        tv3.setText(n + "");
         tv3.setTextColor(Color.BLACK);
         tb.addView(tv3);
         return tb;
     }
+
     /**
      * 获取Assets文件
+     *
      * @param fileName
      * @return
      */
-    public static String getFromAssets(Context context,String fileName) {
+    public static String getFromAssets(Context context, String fileName) {
         String result = "";
         try {
             InputStreamReader inputReader = new InputStreamReader(context.getResources().getAssets().open(fileName));
             BufferedReader bufReader = new BufferedReader(inputReader);
             String line = "";
             while ((line = bufReader.readLine()) != null)
-                result += line+"\r\n";
+                result += line + "\r\n";
             return result;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return result;
     }
-    public static Vector<Byte> getXmlBitmap(Context context){
+
+    public static Vector<Byte> getXmlBitmap(Context context) {
         LabelCommand tsc = new LabelCommand();
         // 设置标签尺寸宽高，按照实际尺寸设置 单位mm
         tsc.addUserCommand("\r\n");
@@ -219,7 +268,7 @@ public class PrintContent {
         tsc.addTear(LabelCommand.RESPONSE_MODE.ON);
         // 清除打印缓冲区
         tsc.addCls();
-        Bitmap bitmap=getBitmap(context);
+        Bitmap bitmap = getBitmap(context);
         // 绘制图片
         /**
          * x:打印起始横坐标
@@ -227,7 +276,7 @@ public class PrintContent {
          * mWidth：打印宽度以dot为单位
          * nbitmap：源图
          */
-        tsc.drawXmlImage(10,10,bitmap.getWidth(),bitmap);
+        tsc.drawXmlImage(10, 10, bitmap.getWidth(), bitmap);
         // 打印标签
         tsc.addPrint(1, 1);
         return tsc.getCommand();

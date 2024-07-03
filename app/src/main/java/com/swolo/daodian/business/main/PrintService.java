@@ -124,7 +124,7 @@ public class PrintService extends Service {
                     tipsToast("请先连接打印机\n");
                     return;
                 }
-                boolean result = printer.getPortManager().writeDataImmediately(PrintContent.getOrderLabel(PrintService.this, 3, order));
+                boolean result = printer.getPortManager().writeDataImmediately(PrintContent.getOrderLabel1(PrintService.this, 3, order));
                 if (result) {
                     commitPrintOrder(order);
                     tipsToast("打印成功\n");
